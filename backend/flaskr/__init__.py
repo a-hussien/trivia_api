@@ -126,6 +126,9 @@ def create_app(test_config=None):
     if (len(question) == 0 or len(answer) == 0):
       abort(422)
 
+    if not(difficulty or category):
+      abort(422)
+
     try:
       new_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
       new_question.insert()
@@ -152,14 +155,19 @@ def create_app(test_config=None):
     try:
       body = request.get_json()
       search_term = body.get('searchTerm', None)
-      search_result = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
 
-      return jsonify({
-        'success':True,
-        'questions': [question.format() for question in search_result],
-        'total_questions': len(search_result),
-        'current_category': None
-      })
+      if search_term:
+        search_result = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
+
+        return jsonify({
+          'success':True,
+          'questions': [question.format() for question in search_result],
+          'total_questions': len(search_result),
+          'current_category': None
+        })
+
+      else:
+        abort(404)
 
     except:
       abort(404)
