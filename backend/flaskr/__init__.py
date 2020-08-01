@@ -89,7 +89,7 @@ def create_app(test_config=None):
   
 
   
-  # TODO: Create an endpoint to DELETE question using a question ID. 
+  # Done: Create an endpoint to DELETE question using a question ID. 
   
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
@@ -118,14 +118,17 @@ def create_app(test_config=None):
     
     body = request.get_json()
 
+    # Define variables from the request
     question = body.get('question')
     answer = body.get('answer')
     difficulty = body.get('difficulty')
     category = body.get('category')
 
+    # check if question or answer is empty
     if (len(question) == 0 or len(answer) == 0):
       abort(422)
 
+    # check if difficulty or category is empty
     if not(difficulty or category):
       abort(422)
 
@@ -149,6 +152,7 @@ def create_app(test_config=None):
   
   # Done: Create a POST endpoint to get questions based on a search term.
   # It should return any questions for whom the search term is a substring of the question. 
+
   @app.route('/questions/search', methods=['POST'])
   def search_questions():
     
@@ -207,8 +211,10 @@ def create_app(test_config=None):
   # This endpoint should take category and previous question parameters 
   # and return a random questions within the given category, 
   # if provided, and that is not one of the previous questions.
+  
   @app.route('/quizzes', methods=['POST'])
   def play_quiz():
+
     try:
       body = request.get_json()
       category = body.get('quiz_category')
@@ -267,6 +273,14 @@ def create_app(test_config=None):
       'message': 'Unprocessable Entity'
     }), 422
 
+  # Error Code 400 shows message (bad request) in json format
+  @app.errorhandler(500)
+  def server_error(error):
+    return jsonify({
+      'success': False,
+      'error': 500,
+      'message': 'Internal Server Error'
+    })
 
   return app
 
